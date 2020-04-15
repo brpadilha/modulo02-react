@@ -8,10 +8,7 @@ import "./App.css";
 import Header from "./components/Header";
 
 export default function App() {
-  const [projects, setProjects] = useState([
-    "Desenvolvimento de app",
-    "FrontEnd web",
-  ]);
+  const [projects, setProjects] = useState([]);
   //retorna um array com 2 posições
   //
   //1. Variável com valor inicial
@@ -19,16 +16,21 @@ export default function App() {
 
   useEffect(() => {
     api.get("projects").then((response) => {
-      setProjects([...projects, response]);
+      setProjects(response.data);
     });
   }, []);
 
-  function handleAddProject() {
+  async function handleAddProject() {
     // projects.push(`Novo projeto ${Date.now()}`); //adiciona um novo projeto no projects
 
-    setProjects([...projects, `Novo projeto ${Date.now()}`]); //copia os projetos que estavam antigamente, e depois adiciona um novo projeto, aplicando assim a imutabilidade.
+    // setProjects([...projects, `Novo projeto ${Date.now()}`]); //copia os projetos que estavam antigamente, e depois adiciona um novo projeto, aplicando assim a imutabilidade.
+    const response = await api.post("projects", {
+      title: `Novo projeto ${Date.now()}`,
+      owner: "Diego fernandes",
+    });
 
-    console.log(projects);
+    const project = response.data;
+    setProjects([...projects, project]);
   }
 
   return (
@@ -38,9 +40,9 @@ export default function App() {
         {projects.map((
           project //map vai percorrer o array projetos e retornar cada projeto dentro dele.
         ) => (
-          <li key={project}>{project}</li> //devemos colocar a key pois é algo único da lista, geralmente é o id
+          <li key={project.id}>{project.title}</li> //devemos colocar a key pois é algo único da lista, geralmente é o id
         ))}
-
+        {/* <input type="text" /> */}
         <button type="button" onClick={handleAddProject}>
           {/* Botão que chama a função para adicionar um novo projeto */}
           Adicionar projeto
